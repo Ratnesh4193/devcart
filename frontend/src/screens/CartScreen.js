@@ -9,10 +9,8 @@ import {
 	Form,
 } from "react-bootstrap";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
-import Rating from "../components/Rating";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "../actioṉs/cartActions.js";
-import Loader from "../components/Loader.js";
+import { addToCart, removeFromCart } from "../actioṉs/cartActions.js";
 import Message from "../components/Message.js";
 
 const CartScreen = () => {
@@ -32,6 +30,7 @@ const CartScreen = () => {
 
 	const removeFromCartHandler = (id) => {
 		console.log(id);
+		dispatch(removeFromCart(id));
 	};
 
 	const checkOutHandler = () => {
@@ -57,7 +56,7 @@ const CartScreen = () => {
 											<Image src={item.image} alt={item.name} fluid rounded />
 										</Col>
 										<Col md={3}>
-											<Link to={`/products/${item.product}`}>{item.name}</Link>
+											<Link to={`/product/${item.product}`}>{item.name}</Link>
 										</Col>
 										<Col md={2}>${item.price}</Col>
 										<Col md={2}>
@@ -110,7 +109,7 @@ const CartScreen = () => {
 						<ListGroup.Item>
 							<Button
 								type='button'
-								class='btn btn-block btn-dark'
+								className='btn btn-block btn-dark'
 								disabled={cartItems.length === 0}
 								onClick={checkOutHandler}>
 								Proceed to checkout
