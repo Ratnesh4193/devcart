@@ -11,7 +11,7 @@
 <!-- - Top products carousel -->
 <!-- - Product pagination -->
 <!-- - Product search feature -->
-- User profile with orders
+- User profile with user orders
 - Admin product management
 - Admin user management
 - Admin Order details page
