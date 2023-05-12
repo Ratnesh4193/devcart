@@ -1,5 +1,5 @@
 # DevCart eCommerce Platform
-### Live on (https://devcart.herokuapp.com/)
+### Live on (https://devcart.onrender.com/)
 > eCommerce platform built with the MERN stack & Redux.
 
 <!-- ![screenshot]() -->
