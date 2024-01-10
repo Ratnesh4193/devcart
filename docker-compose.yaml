@@ -6,8 +6,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - $REACT_LOCAL_PORT:$REACT_DOCKER_PORT
-    image: frontend-image:latest
-    container_name: frontend-container
+    image: devcart-frontend:latest
+    container_name: devcart-frontend
     env_file: .env
     networks:
       - mern-stack-network
@@ -22,9 +22,9 @@ services:
     restart: unless-stopped
     ports:
       - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
-    image: backend-image:latest
+    image: devcart-backend:latest
     env_file: .env
-    container_name: backend-container
+    container_name: devcart-backend
     networks:
       - mern-stack-network
     volumes:

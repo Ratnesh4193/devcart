@@ -1,0 +1,135 @@
+
+pipeline{
+    agent any
+    tools{
+        jdk 'jdk17'
+        nodejs 'node16'
+    }
+    environment {
+        SCANNER_HOME=tool 'sonar-scanner'
+    }
+    stages {
+        stage('clean workspace'){
+            steps{
+                cleanWs()
+            }
+        }
+        stage('Checkout from Git'){
+            steps{
+                git branch: 'docker', url: 'https://github.com/Ratnesh4193/devcart.git'
+            }
+        }
+        stage("Sonarqube Analysis "){
+            steps{
+                withSonarQubeEnv('sonar-server') {
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Devcart \
+                    -Dsonar.projectKey=Devcart '''
+                }
+            }
+        }
+        stage("quality gate"){
+           steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token' 
+                }
+            } 
+        }
+        stage('Install Frontend Dependencies') {
+            steps {
+                dir('frontend') {
+                    script {
+                        sh 'npm install'
+                    }
+                }
+            }
+        }
+
+        stage('Install Backend Dependencies') {
+            steps {
+                dir('backend') {
+                    script {
+                        sh 'npm install'
+                    }
+                }
+            }
+        }
+        
+        stage('OWASP FS SCAN') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+        stage('TRIVY FS SCAN') {
+            steps {
+                sh "trivy fs . > trivyfs.txt"
+            }
+        }
+        stage('Create .env file') {
+            steps {
+                script {
+                    def envContent = """
+                        
+                    """
+                    
+                    writeFile file: '.env', text: envContent
+                }
+            }
+        }
+        stage("Docker Build & Push"){
+            steps{
+                script{
+                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
+                       sh "docker compose build"
+                       sh "docker tag devcart-frontend skyhunter93/devcart-frontend:latest "
+                       sh "docker tag devcart-backend skyhunter93/devcart-backend:latest "
+                       sh "docker push skyhunter93/devcart-frontend:latest "
+                       sh "docker push skyhunter93/devcart-backend:latest "
+                    }
+                }
+            }
+        }
+        stage("TRIVY"){
+            steps{
+                sh "trivy image skyhunter93/devcart-backend:latest > trivy-devcart-backend-image.txt"
+                sh "trivy image skyhunter93/devcart-frontend:latest > trivy-devcart-frontend-image.txt" 
+            }
+        }
+        stage('Deploy to containers'){
+            steps{
+                sh 'docker compose up -d --build'
+            }
+        }
+    }
+}
+
+
+// to install docker and docker compose
+
+// for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
+// #################################################################################################
+// # Add Docker's official GPG key:
+// sudo apt-get update
+// sudo apt-get install ca-certificates curl gnupg
+// sudo install -m 0755 -d /etc/apt/keyrings
+// curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+// sudo chmod a+r /etc/apt/keyrings/docker.gpg
+// ###################################################################################################
+// # Add the repository to Apt sources:
+// echo \
+//   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+//   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+//   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+// sudo apt-get update
+// ###################################################################################################
+// sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+// ###################################################################################################
+// sudo docker run hello-world
+// ###################################################################################################
+// curl -SL https://github.com/docker/compose/releases/download/v2.23.3/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+// ###################################################################################################
+// sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+// ###################################################################################################
+// sudo usermod -a -G docker jenkins
+// ###################################################################################################
+// sudo systemctl restart jenkins

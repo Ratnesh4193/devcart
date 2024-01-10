@@ -1,13 +1,8 @@
 import mongoose from "mongoose";
 // import dotenv
 const connectDB = async () => {
-  const {
-    MONGODB_USER,
-    MONGODB_PASSWORD,
-    MONGODB_HOST,
-    MONGODB_LOCAL_PORT,
-    MONGODB_DATABASE,
-  } = process.env;
+  const { MONGODB_USER, MONGODB_PASSWORD, MONGODB_HOST, MONGODB_DATABASE } =
+    process.env;
 
   // const url = `mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:${MONGODB_LOCAL_PORT}/${MONGODB_DATABASE}?authSource=admin`;
   const url = `mongodb+srv://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}/${MONGODB_DATABASE}?retryWrites=true&w=majority`;

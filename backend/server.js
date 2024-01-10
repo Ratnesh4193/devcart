@@ -1,7 +1,6 @@
 import express from "express";
 import connectDB from "./config/connectDB.js";
 import dotenv from "dotenv";
-import colors from "colors";
 import path from "path";
 import productRoutes from "./routes/productRoutes.js";
 import userRoutes from "./routes/userRoutes.js";

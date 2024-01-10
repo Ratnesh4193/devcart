@@ -1,11 +1,10 @@
 import express from "express";
 import {
-	placeOrder,
-	getOrderById,
-	updateOrderToPaid,
-	updateOrderToDelivered,
-	getMyOrders,
-	getOrders,
+  placeOrder,
+  getOrderById,
+  updateOrderToPaid,
+  updateOrderToDelivered,
+  getMyOrders,
 } from "../controllers/orderControllers.js";
 import { protect } from "../middleware/authMiddleware.js";
 
