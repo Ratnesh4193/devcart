@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-devcart
+spec:
+  selector:
+    app: devcart
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+  type: LoadBalancer # Use LoadBalancer for cloud providers that support it, or NodePort for testing
